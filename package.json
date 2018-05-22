@@ -1,6 +1,6 @@
 {
   "name": "@pimex/email",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Pimex email lib for Pimex services",
   "main": "./index.js",
   "scripts": {
