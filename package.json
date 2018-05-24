@@ -16,7 +16,7 @@
     "test": "NODE_ENV=test ava -v ./test/**.js",
     "server-start": "pm2 start ./dist/server.js",
     "build": "babel src --out-dir dist",
-    "prepublish": "npm run build",
+    "prepublishOnly": "npm run build",
     "watch": "babel src --out-dir dist --watch"
   },
   "ava": {
