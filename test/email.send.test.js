@@ -1,11 +1,11 @@
 'use strict'
 
 import test from 'ava'
-import Email from '../lib/email.js'
+import Email from '../src/lib/email.js'
 import uuid from 'uuid-base62'
 import fixtures from './fixtures'
-import config from '../config'
-import Server from '../services'
+import config from '../src/config'
+import Server from '../src/services'
 import request from 'request-promise'
 
 test.beforeEach(async t => {
@@ -32,7 +32,7 @@ test('Send Email - Error Missing parameter', async t => {
   const emailData = fixtures.getEmailData()
   delete emailData.to
 
-  const mError = await t.throws(Email.send(emailData, config.domain))
+  const mError = await t.throws(Email.send(emailData, config.providers.mailgun.domain))
 
   t.regex(mError.error.message, /parameter is missing/)
 })

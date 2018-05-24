@@ -2,7 +2,7 @@
 
 import Mailgun from 'mailgun-js'
 import request from 'request-promise'
-import {email as config} from '../config'
+import config from '../config'
 import crypto from 'crypto'
 
 const apiKey = config.providers.mailgun.key

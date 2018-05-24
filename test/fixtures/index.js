@@ -1,7 +1,7 @@
 'use strict'
 
 import uuid from 'uuid-base62'
-import config from '../../config'
+import config from '../../src/config'
 
 module.exports = {
   getNewMessageIn () {
@@ -45,7 +45,7 @@ module.exports = {
 
   getEmailData () {
     return {
-      from: `${uuid.v4()}@${config.domain}`,
+      from: `${uuid.v4()}@${config.providers.mailgun.domain}`,
       to: 'jquiceno@pimex.co',
       subject: 'Hello from Mailgun, test support email',
       html: 'Hello, This is not a plain-text email, I wanted to test some spicy Mailgun sauce in NodeJS! <a href="http://pimex.co">Click here to add your email address to a mailing list</a>',

@@ -1,9 +1,9 @@
 'use strict'
 
 import test from 'ava'
-import Email from '../lib/email.js'
+import Email from '../src/lib/email.js'
 import fixtures from './fixtures'
-import config from '../config'
+import config from '../src/config'
 
 let newMessage = null
 

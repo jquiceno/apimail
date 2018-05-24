@@ -34,7 +34,7 @@ class Message {
     return Promise.resolve(message)
   }
 
-  static async send (data, domain = config.domain) {
+  static async send (data, domain = config.providers.mailgun.domain) {
     if(!data) {
       return Promise.reject({
         error: {

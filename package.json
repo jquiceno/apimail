@@ -2,11 +2,22 @@
   "name": "@pimex/email",
   "version": "0.0.5",
   "description": "Pimex email lib for Pimex services",
-  "main": "./index.js",
+  "main": "./dist/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@gitlab.com/pimex/core-email.git"
+  },
+  "bugs": {
+    "url": "https://gitlab.com/pimex/core-email/issues"
+  },
+  "homepage": "https://pimex.co/",
   "scripts": {
-    "dev": "NODE_ENV=test babel-node ./server.js",
+    "dev": "NODE_ENV=test node ./dist/server.js",
     "test": "NODE_ENV=test ava -v ./test/**.js",
-    "server-start": "pm2 start ./server.js"
+    "server-start": "pm2 start ./dist/server.js",
+    "build": "babel src --out-dir dist",
+    "prepublish": "npm run build",
+    "watch": "babel src --out-dir dist --watch"
   },
   "ava": {
     "require": [
@@ -17,12 +28,11 @@
   "author": "jquiceno",
   "license": "ISC",
   "dependencies": {
-    "@babel/core": "^7.0.0-beta.47",
     "@google-cloud/firestore": "^0.14.0",
-    "hapi": "^17.4.0",
+    "hapi": "^17.5.0",
     "mailgun-js": "^0.18.0",
     "pm2": "^2.10.4",
-    "request": "^2.86.0",
+    "request": "^2.87.0",
     "request-promise": "^4.2.2"
   },
   "devDependencies": {
@@ -33,7 +43,12 @@
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-es2015": "^6.24.1",
     "babel-register": "^6.26.0",
-    "babel-runtime": "^6.26.0",
     "uuid-base62": "^0.1.0"
+  },
+  "pimex": {
+    "modules": {
+      "email": "./config/config.json"
+    }
   }
+
 }
