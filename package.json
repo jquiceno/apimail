@@ -1,6 +1,6 @@
 {
   "name": "@pimex/email",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Pimex email lib for Pimex services",
   "main": "./dist/index.js",
   "repository": {
