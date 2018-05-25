@@ -6,7 +6,7 @@ import config from '../../config/config.json'
 
 function findRcFile(directory = false) {
     if (!directory) {
-        directory = path.dirname(module.parent.filename)
+        directory = path.dirname(require.main.filename)
     }
     var file = path.resolve(directory, 'package.json')
     if (fs.existsSync(file) && fs.statSync(file).isFile()) {
