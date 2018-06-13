@@ -1,5 +1,3 @@
-'use strict'
-
 import Mailgun from './mailgun.js'
 import Event from './event.js'
 import Db from './db.js'
@@ -89,32 +87,34 @@ class Message {
   static async add (data, service) {
     const db = Db.init(collection)
     const ref = await db.doc()
+    const timestamp = data.timestamp || Date.now() / 1000
+    const date = new Date(timestamp * 1000)
     let rMessage = null
-
-    data.to = data.to || data['To']
 
     if(data['In-Reply-To']) {
       rMessage = await Message.getAllBy('service.id', data['In-Reply-To'].substr(0, data['In-Reply-To'].length - 1).substr(1))
       rMessage = rMessage[0].id
     }
 
-    let me = {}
-    Object.keys(data).forEach((e, i) => {
-      if (data[e]) {
-        me[e] = data[e]
-      }
-    })
-
-    const today = new Date()
     const message = await ref.set({
+      to: data.to || data['To'],
+      from: data.from || data['From'],
+      subject: data.subject || data['Subject'],
       state: data['X-Mailgun-Incoming'] ? 'received' : 'send',
-      data: me,
+      recipient: data['recipient'] || null,
+      sender: data.sender || null,
+      'user-agent': data['user-agent'] || data['User-Agent'] || null,
+      'body-html': data['body-html'] || data.html || null,
+      'body-plain': data['body-plain'] || null,
+      'stripped-html': data['stripped-html'] || data.html || null,
+      'stripped-text': data['stripped-text'] || null,
+      'message-headers': data['message-headers'] || null,
       service,
-      date: {
-        t: Date.now() / 1000,
-        y: (new Date()).getFullYear(),
-        m: today.getMonth() + 1,
-        d: today.getDate()
+      _date: {
+        t: timestamp,
+        y: date.getFullYear(),
+        m: date.getMonth() + 1,
+        d: date.getDate()
       },
       replyTo: rMessage
     })
@@ -140,6 +140,17 @@ class Message {
     }
 
     return eventData
+  }
+
+  async info () {
+    try {
+      const messageData = await this.getData()
+      const mg = new Mailgun(messageData.service.id, 'test.pimex.email')
+      const info = await mg.info()
+      return Promise.resolve(info)
+    } catch (e) {
+      return Promise.reject(e)
+    }
   }
 }
 

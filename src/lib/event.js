@@ -1,5 +1,3 @@
-'use strict'
-
 import Db from './db.js'
 import Mailgun from './mailgun.js'
 
@@ -32,15 +30,16 @@ class Event {
     return Promise.resolve(event)
   }
 
-  static async add (event) {
+  static async add (data) {
     const Message = require('./message')
     const db = Db.init(collection)
-    const today = new Date()
+    const timestamp = data.timestamp || Date.now() / 1000
+    const date = new Date(timestamp * 1000)
     let ref = await db.doc()
     let message = null
 
     try {
-      await Mailgun.validEvent(event)
+      await Mailgun.validEvent(data)
     } catch (e) {
       return Promise.reject(e)
     }
@@ -60,21 +59,21 @@ class Event {
     // }
 
     try {
-      if (!event.message) {
-        if (event['Message-Id'] && typeof event['message-id'] === 'undefined') {
-          event['message-id'] = event['Message-Id']
+      if (!data.message) {
+        if (data['Message-Id'] && typeof data['message-id'] === 'undefined') {
+          data['message-id'] = data['Message-Id']
         }
 
-        if (event['message-id'].substr(0, 1) === '<') {
-          event['message-id'] = event['message-id'].substr(0, event['message-id'].length - 1).substr(1)
+        if (data['message-id'].substr(0, 1) === '<') {
+          data['message-id'] = data['message-id'].substr(0, data['message-id'].length - 1).substr(1)
         }
 
-        message = await Message.getAllBy('service.id', event['message-id'])
+        message = await Message.getAllBy('service.id', data['message-id'])
         if (message.length <= 0) {
           throw new Error('The event does not belong to a valid message')
         }
 
-        event.message = message[0].id
+        data.message = message[0].id
       }
     } catch (e) {
       return Promise.reject({
@@ -86,22 +85,25 @@ class Event {
     }
 
     try {
-      let ev = {}
-      Object.keys(event).forEach((e, i) => {
-        if (event[e]) {
-          ev[e] = event[e]
-        }
-      })
-
-      await ref.set({
-        message: event.message,
-        event: event.event,
-        data: ev,
-        date: {
-          t: Date.now() / 1000,
-          y: (new Date()).getFullYear(),
-          m: today.getMonth() + 1,
-          d: today.getDate()
+      const event = await ref.set({
+        message: data.message,
+        event: data.event,
+        city: data.city || null,
+        recipient: data.recipient || null,
+        region: data.region || null,
+        ip: data.ip || null,
+        domain: data.domain || null,
+        'device-type': data['device-type'] || null,
+        country: data.country || null,
+        'client-type': data['client-type'] || null,
+        'client-os': data['client-os'] || null,
+        'client-name': data['client-name'] || null,
+        'user-agent': data['user-agent'] || data['User-Agent'] || null,
+        _date: {
+          t: timestamp,
+          y: date.getFullYear(),
+          m: date.getMonth() + 1,
+          d: date.getDate()
         }
       })
 

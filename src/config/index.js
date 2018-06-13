@@ -34,7 +34,7 @@ function getDataBySourse (mainPath, soursePath) {
 
 const env = process.env.NODE_ENV || 'production'
 
-const rcFilePath = findRcFile()
+const rcFilePath = findRcFile(process.env.PIMEX_CONFIG)
 const mainPath = path.dirname(rcFilePath)
 let configData = null
 let dbKeyFilename = null

@@ -1,9 +1,32 @@
-'use strict'
-
 import Email from '../lib/email.js'
 import Message from '../lib/message.js'
 
 function routes (server) {
+  server.route({
+    method: 'GET',
+    path: '/{id}',
+    handler: async (req, h) => {
+      const messageId = req.params.id
+      // const body = request.payload
+      // body.message = messageId
+      let res
+
+      try {
+        const message = new Message(messageId)
+        // const email = await Email.send(body)
+        res = {
+          data: await message.getData(),
+          status_code: 201
+        }
+      } catch (e) {
+        console.log(e)
+        res = e
+      }
+
+      return h.response(res).code(res.status_code)
+    }
+  })
+
   server.route({
     method: 'POST',
     path: '/',
