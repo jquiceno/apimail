@@ -11,6 +11,21 @@ class Message {
     this.db = Db.init(collection)
   }
 
+  async getEvents () {
+    try {
+      const events = await Event.getAllBy('message', this.id)
+
+      return Promise.resolve(events)
+    } catch (e) {
+      return Promise.reject({
+        error: {
+          message: e.message,
+        },
+        status_code: 404,
+      })
+    }
+  }
+
   async getData () {
     let message
 
@@ -18,7 +33,7 @@ class Message {
       const messageRef = this.db.doc(this.id)
       message = await messageRef.get()
       message = message.data()
-      message.id = messageRef.id
+      message.ID = messageRef.id
     } catch (e) {
       return Promise.reject({
         error: {
@@ -61,7 +76,7 @@ class Message {
     }
 
     return Promise.resolve({
-      id: message
+      ID: message
     })
   }
 

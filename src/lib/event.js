@@ -9,6 +9,32 @@ class Event {
     this.db = Db.init(collection)
   }
 
+  static async getAllBy(key, value) {
+    try {
+      const db = Db.init(collection)
+      const ref = db
+      let events = []
+
+      const query = await ref.where(key, '==', value).orderBy('_date.t', 'desc').get()
+
+      query.forEach(leadRef => {
+        let eventData = leadRef.data()
+        eventData.ID = leadRef.id
+        events.push(eventData)
+      })
+
+      return Promise.resolve(events)
+    } catch (e) {
+      console.log(JSON.stringify(e))
+      return Promise.reject({
+        error: {
+          message: e.details
+        },
+        status_code: 404,
+      })
+    }
+  }
+
   async getData () {
     let event
 

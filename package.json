@@ -13,7 +13,7 @@
   "homepage": "https://pimex.co/",
   "scripts": {
     "dev": "NODE_ENV=test node ./dist/server.js",
-    "test": "NODE_ENV=test ava -v ./test/**.js",
+    "test": "PIMEX_CONFIG=. NODE_ENV=test ava -v -s ./test/**.js",
     "server-start": "pm2 start ./dist/server.js",
     "build": "babel src --out-dir dist",
     "postinstall": "npm run build",

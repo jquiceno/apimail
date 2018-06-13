@@ -9,7 +9,7 @@ let newMessage = null
 
 test.before(async t => {
   const message = await Email.send(fixtures.getEmailData(), config.domain)
-  newMessage = message.id
+  newMessage = message.ID
 })
 
 test('Get email message by id', async t => {
@@ -17,7 +17,7 @@ test('Get email message by id', async t => {
   const message = new Email(messageId)
   const messageData = await message.getData()
 
-  t.deepEqual(messageId, messageData.id)
+  t.deepEqual(messageId, messageData.ID, 'Message ID not is equal')
 })
 
 test('Error message not fount', async t => {
