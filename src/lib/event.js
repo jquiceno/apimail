@@ -25,7 +25,6 @@ class Event {
 
       return Promise.resolve(events)
     } catch (e) {
-      console.log(JSON.stringify(e))
       return Promise.reject({
         error: {
           message: e.details

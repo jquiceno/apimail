@@ -4,6 +4,25 @@ import Message from '../lib/message.js'
 function routes (server) {
   server.route({
     method: 'GET',
+    path: '/{id}/preview',
+    handler: async (req, h) => {
+      const messageId = req.params.id
+      let res
+
+      try {
+        const message = new Message(messageId)
+        const messageData = await message.getData()
+
+        return h.response(messageData['body-html']).type('text/html').code(200)
+      } catch (e) {
+        console.log(e)
+        return h.response(e).code(e.status_code)
+      }
+    }
+  })
+
+  server.route({
+    method: 'GET',
     path: '/{id}/events',
     handler: async (req, h) => {
       const messageId = req.params.id
