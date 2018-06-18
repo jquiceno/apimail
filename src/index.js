@@ -1,7 +1,9 @@
-const server = require('./services/')
-const Email = require('./lib/email.js')
+import Event from './lib/event'
+import Server from './services/'
+import Email from './lib/email.js'
 
 module.exports = {
   email: Email,
-  server: server
+  server: Server,
+  event : Event
 }

@@ -1,6 +1,8 @@
 import Db from './db.js'
 import Mailgun from './mailgun.js'
+import EventEmitter from 'events'
 
+const emitter = new EventEmitter()
 const collection = 'events'
 
 class Event {
@@ -9,13 +11,21 @@ class Event {
     this.db = Db.init(collection)
   }
 
+  static on (event, callback) {
+    return emitter.on(event, callback)
+  }
+
+  static emit (event, params) {
+    return emitter.emit(event, params)
+  }
+
   static async getAllBy(key, value) {
     try {
       const db = Db.init(collection)
       const ref = db
       let events = []
 
-      const query = await ref.where(key, '==', value).orderBy('_date.t', 'desc').get()
+      const query = await ref.where(key, '==', value).orderBy('_date.ut', 'desc').get()
 
       query.forEach(leadRef => {
         let eventData = leadRef.data()
@@ -98,7 +108,7 @@ class Event {
           throw new Error('The event does not belong to a valid message')
         }
 
-        data.message = message[0].id
+        data.message = message[0].ID
       }
     } catch (e) {
       return Promise.reject({
@@ -125,7 +135,7 @@ class Event {
         'client-name': data['client-name'] || null,
         'user-agent': data['user-agent'] || data['User-Agent'] || null,
         _date: {
-          t: timestamp,
+          ut: timestamp,
           y: date.getFullYear(),
           m: date.getMonth() + 1,
           d: date.getDate()

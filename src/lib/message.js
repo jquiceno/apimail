@@ -89,7 +89,7 @@ class Message {
 
       query.forEach(messageRef => {
         let messageData = messageRef.data()
-        messageData.id = messageRef.id
+        messageData.ID = messageRef.id
         messages.push(messageData)
       })
     } catch (e) {
@@ -108,7 +108,7 @@ class Message {
 
     if(data['In-Reply-To']) {
       rMessage = await Message.getAllBy('service.id', data['In-Reply-To'].substr(0, data['In-Reply-To'].length - 1).substr(1))
-      rMessage = rMessage[0].id
+      rMessage = rMessage[0].ID
     }
 
     const message = await ref.set({
@@ -126,7 +126,7 @@ class Message {
       'message-headers': data['message-headers'] || null,
       service,
       _date: {
-        t: timestamp,
+        ut: timestamp,
         y: date.getFullYear(),
         m: date.getMonth() + 1,
         d: date.getDate()

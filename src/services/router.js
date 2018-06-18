@@ -1,3 +1,4 @@
+import Event from '../lib/event'
 import Email from '../lib/email.js'
 import Message from '../lib/message.js'
 
@@ -13,7 +14,7 @@ function routes (server) {
         const message = new Message(messageId)
         const messageData = await message.getData()
 
-        return h.response(messageData['body-html']).type('text/html').code(200)
+        return h.response(messageData['stripped-html']).type('text/html; charset=utf-8').code(200)
       } catch (e) {
         console.log(e)
         return h.response(e).code(e.status_code)
@@ -54,10 +55,13 @@ function routes (server) {
 
       try {
         const message = new Message(messageId)
+        const messageData = await message.getData()
         res = {
           data: await message.getData(),
           status_code: 201
         }
+
+        Event.emit('message.get', messageData)
       } catch (e) {
         console.log(e)
         res = e
@@ -126,12 +130,19 @@ function routes (server) {
           provider: 'mailgun',
           id: body['Message-Id'].substr(0, body['Message-Id'].length - 1).substr(1)
         })
+
         res = {
           data: {
             id: message
           },
           status_code: 201
         }
+
+        Event.emit('message.email.received', {
+          message: {
+            ID: message
+          }
+        })
       } catch (e) {
         console.log(e)
         res = {
