@@ -57,15 +57,22 @@ class Message {
       })
     }
 
+    const db = Db.init(collection)
+    const ref = await db.doc()
+
     let message
 
     try {
+      await ref.set({
+        state: 'sending'
+      })
+
       const mgResponse = await Mailgun.send(data, domain)
 
       message = await Message.add(data, {
         provider: 'mailgun',
         id: mgResponse.id.substr(0, mgResponse.id.length - 1).substr(1)
-      })
+      }, ref.id)
     } catch (e) {
       return Promise.reject({
         error: {
@@ -99,9 +106,9 @@ class Message {
     return messages
   }
 
-  static async add (data, service) {
+  static async add (data, service, id = null) {
     const db = Db.init(collection)
-    const ref = await db.doc()
+    const ref = await db.doc(id)
     const timestamp = data.timestamp || Date.now() / 1000
     const date = new Date(timestamp * 1000)
     let rMessage = null
