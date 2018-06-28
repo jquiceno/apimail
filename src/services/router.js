@@ -133,7 +133,7 @@ function routes (server) {
 
         res = {
           data: {
-            id: message
+            ID: message
           },
           status_code: 201
         }

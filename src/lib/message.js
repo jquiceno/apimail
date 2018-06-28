@@ -108,7 +108,7 @@ class Message {
 
   static async add (data, service, id = null) {
     const db = Db.init(collection)
-    const ref = await db.doc(id)
+    const ref = id ? await db.doc(id) : await db.doc()
     const timestamp = data.timestamp || Date.now() / 1000
     const date = new Date(timestamp * 1000)
     let rMessage = null

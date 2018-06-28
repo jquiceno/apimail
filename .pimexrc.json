@@ -1,0 +1,17 @@
+{
+  "modules": {
+    "message": {
+      "name": "email",
+      "db": {
+        "projectId": "pimex-email-test",
+        "keyFilename": "./config/test-key.json"
+      },
+      "providers": {
+        "mailgun": {
+          "key": "",
+          "domain": "test.pimex.email"
+        }
+      }
+    }
+  }
+}
