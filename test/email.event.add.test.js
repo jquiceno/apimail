@@ -8,16 +8,17 @@ import config from '../src/config'
 import Server from '../src/services'
 import request from 'request-promise'
 
-test.beforeEach(async t => {
-  const server = await Server.start('test')
-  t.context.server = server
+const domain = config.providers.mailgun.domain
+
+let server = null
+
+test.before(async t => {
+  server = await Server.start('test')
 })
 
 test('Add new event', async t => {
-  const server = t.context.server
-
-  const newEmail = await Email.send(fixtures.getEmailData(), config.providers.mailgun.domain)
-  const email = new Email(newEmail.id)
+  const newEmail = await Email.send(fixtures.getEmailData(), domain)
+  const email = new Email(newEmail.ID)
   const messageData = await email.getData()
   const eventData = fixtures.getEventData(messageData.service.id).opened
 

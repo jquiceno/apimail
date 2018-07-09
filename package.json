@@ -14,7 +14,8 @@
   "scripts": {
     "dev": "NODE_ENV=test node ./dist/server.js",
     "test": "PIMEX_CONFIG=. NODE_ENV=test ava -v -s ./test/**.js",
-    "server-start": "pm2 start ./dist/server.js",
+    "init": "pm2 start ./dist/server.js",
+    "start": "node ./dist/server.js",
     "build": "babel src --out-dir dist",
     "postinstall": "npm run build",
     "watch": "babel src --out-dir dist --watch"

@@ -8,13 +8,13 @@ import config from '../src/config'
 import Server from '../src/services'
 import request from 'request-promise'
 
-test.beforeEach(async t => {
-  const server = await Server.start('test')
-  t.context.server = server
+let server = null
+
+test.before(async t => {
+  server = await Server.start('test')
 })
 
 test('Send email', async t => {
-  const server = t.context.server
   const e = await request({
     method: 'POST',
     body: fixtures.getEmailData(),
@@ -24,7 +24,7 @@ test('Send email', async t => {
 
   // const e = await Email.send(fixtures.getEmailData(), config.domain)
 
-  t.is(typeof e.data.id, 'string')
+  t.is(typeof e.data.ID, 'string')
   t.is(e.status_code, 201)
 })
 

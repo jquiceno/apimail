@@ -4,6 +4,7 @@ import config from '../config'
 import crypto from 'crypto'
 
 const apiKey = config.providers.mailgun.key
+const domain = config.providers.mailgun.domain
 
 class Mgun {
   constructor (id) {
@@ -11,9 +12,9 @@ class Mgun {
       this.id = id
       this.mailgun = new Mailgun({
         apiKey,
-        domain: 'test.pimex.email'
+        domain: domain
       })
-      this.domain = 'test.pimex.email'
+      this.domain = domain
     } catch (e) {
       console.log(e)
       throw new Error('Hubo un error iniciando Mailgun')
@@ -54,7 +55,8 @@ class Mgun {
     })
   }
 
-  static send (data, domain) {
+  static send (data, domain = false) {
+    domain = domain || this.domain
     const mailgun = new Mailgun({apiKey, domain})
     return mailgun.messages().send(data)
   }
