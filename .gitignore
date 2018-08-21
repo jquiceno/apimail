@@ -7,3 +7,4 @@ public
 .pimexrc
 package-lock.json
 dist
+*lock.*

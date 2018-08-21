@@ -1,4 +1,4 @@
-import Db from './db.js'
+import Db from './db'
 import Mailgun from './mailgun.js'
 import EventEmitter from 'events'
 

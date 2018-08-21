@@ -1,6 +1,6 @@
 import Mailgun from './mailgun.js'
 import Event from './event.js'
-import Db from './db.js'
+import Db from './db'
 import config from '../config'
 
 const collection = 'messages'
