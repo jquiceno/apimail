@@ -1,7 +1,7 @@
 {
-  "name": "@pimex/email",
+  "name": "@pimex/messages",
   "version": "0.0.15",
-  "description": "Pimex email lib for Pimex services",
+  "description": "Pimex messages service",
   "main": "./dist/index.js",
   "repository": {
     "type": "git",
@@ -13,7 +13,7 @@
   "homepage": "https://pimex.co/",
   "scripts": {
     "dev": "NODE_ENV=test node ./dist/server.js",
-    "test": "PIMEX_CONFIG=. NODE_ENV=test ava -v -s ./test/**.js",
+    "test": "NODE_ENV=test ava -v -s ./test/**.js",
     "init": "pm2 start ./dist/server.js",
     "start": "node ./dist/server.js",
     "build": "babel src --out-dir dist",
@@ -29,9 +29,10 @@
   "author": "jquiceno",
   "license": "ISC",
   "dependencies": {
-    "@google-cloud/firestore": "^0.14.1",
-    "hapi": "^17.5.2",
+    "firebase-admin": "^6.0.0",
+    "hapi": "^17.5.3",
     "mailgun-js": "^0.19.0",
+    "moment": "^2.22.2",
     "pm2": "^2.10.4",
     "request": "^2.87.0",
     "request-promise": "^4.2.2"

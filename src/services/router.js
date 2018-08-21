@@ -1,8 +1,162 @@
 import Event from '../lib/event'
 import Email from '../lib/email.js'
 import Message from '../lib/message.js'
+import Template from '../lib/template'
+import Utils from '../lib/utils'
 
 function routes (server) {
+  server.route({
+    method: 'PUT',
+    path: '/templates/{id}',
+    handler: async (req, h) => {
+      const templateId = req.params.id
+      const body = req.payload
+      let res
+
+      try {
+        console.log(body)
+        const template = new Template(templateId)
+        const templateData = await template.update(body)
+
+        console.log(templateData)
+
+        res = {
+          data: templateData,
+          status_code: 200
+        }
+      } catch (e) {
+        console.log(e)
+        res = e
+      }
+
+      return h.response(res).code(res.status_code)
+    }
+  })
+
+  server.route({
+    method: 'POST',
+    path: '/templates/{id}/render',
+    handler: async (req, h) => {
+      const templateId = req.params.id
+      const body = req.payload
+      let res
+
+      try {
+        const template = new Template(templateId)
+        const templateData = await template.get()
+
+        if (body) {
+          templateData.content = Utils.renderTemplate(templateData.content, body)
+        }
+
+        res = {
+          data: templateData,
+          status_code: 200
+        }
+      } catch (e) {
+        console.log(e)
+        res = e
+      }
+
+      return h.response(res).code(res.status_code)
+    }
+  })
+
+  server.route({
+    method: 'GET',
+    path: '/templates',
+    handler: async (req, h) => {
+      const templateId = req.params.id
+      let res
+
+      try {
+        const templates = await Template.getAll()
+
+        res = {
+          data: templates,
+          status_code: 200
+        }
+      } catch (e) {
+        console.log(e)
+        res = e
+      }
+
+      return h.response(res).code(res.status_code)
+    }
+  })
+
+  server.route({
+    method: 'DELETE',
+    path: '/templates/{id}',
+    handler: async (req, h) => {
+      const templateId = req.params.id
+      let res
+
+      try {
+        const template = new Template(templateId)
+        const templateData = await template.remove()
+
+        res = {
+          data: templateData,
+          status_code: 200
+        }
+      } catch (e) {
+        console.log(e)
+        res = e
+      }
+
+      return h.response(res).code(res.status_code)
+    }
+  })
+
+  server.route({
+    method: 'POST',
+    path: '/templates',
+    handler: async (req, h) => {
+      const body = req.payload
+      let res
+
+      try {
+        const template = await Template.add(body)
+
+        res = {
+          data: template,
+          status_code: 200
+        }
+      } catch (e) {
+        console.log(e)
+        res = e
+      }
+
+      return h.response(res).code(res.status_code)
+    }
+  })
+
+  server.route({
+    method: 'GET',
+    path: '/templates/{id}',
+    handler: async (req, h) => {
+      const templateId = req.params.id
+
+      let res
+
+      try {
+        const template = new Template(templateId)
+        const templateData = await template.get()
+
+        res = {
+          data: templateData,
+          status_code: 200
+        }
+      } catch (e) {
+        console.log(e)
+        res = e
+      }
+
+      return h.response(res).code(res.status_code)
+    }
+  })
+
   server.route({
     method: 'GET',
     path: '/{id}/preview',
