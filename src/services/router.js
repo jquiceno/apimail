@@ -67,10 +67,15 @@ function routes (server) {
     path: '/templates',
     handler: async (req, h) => {
       const templateId = req.params.id
+      const params = req.query
+      const boardId = parseInt(params.board) || null
+
       let res
 
       try {
-        const templates = await Template.getAll()
+        const templates = await Template.getAll({
+          board: boardId
+        })
 
         res = {
           data: templates,

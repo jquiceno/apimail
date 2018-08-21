@@ -52,17 +52,23 @@ class Template {
     return {
       content: true,
       type: true,
-      format: true
+      format: true,
+      board: true
     }
   }
 
-  static async getAll () {
+  static async getAll (params = false) {
     try {
       let templates = {}
+      let templatesRef
 
       const db = Db.init(collection, 'fb')
 
-      const templatesRef = await db.once('value')
+      if (params.board) {
+        templatesRef = await db.orderByChild('board').equalTo(params.board).once('value')
+      } else {
+        templatesRef = await db.once('value')
+      }
 
       templates = templatesRef.val()
 
