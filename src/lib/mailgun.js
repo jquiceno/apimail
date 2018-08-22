@@ -3,8 +3,10 @@ import request from 'request-promise'
 import config from '../config'
 import crypto from 'crypto'
 
-const apiKey = config.providers.mailgun.key
-const domain = config.providers.mailgun.domain
+const configModule = config.modules.messages
+
+const apiKey = configModule.providers.mailgun.key
+const domain = configModule.providers.mailgun.domain
 
 class Mgun {
   constructor (id) {

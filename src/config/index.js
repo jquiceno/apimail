@@ -26,17 +26,15 @@ try {
 
   if (!rcFilePath) throw new Error('Error getting the configuration file .pimexrc.json in module')
 
-  let configData = null
+  let configData = require(rcFilePath)
 
-  configData = require(rcFilePath)
   configData.mainPath = path.dirname(rcFilePath)
+
   if (configData.keysFolder) {
     configData.keysFolder = `${configData.mainPath}/${configData.keysFolder}/`
   }
 
-  configData.modules.messages.keysFolder = configData.keysFolder
-
-  module.exports = configData.modules.messages
+  module.exports = configData
 } catch (e) {
   console.log(e)
   throw new Error(e.message)

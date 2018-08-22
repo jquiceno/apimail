@@ -1,13 +1,15 @@
 import admin from 'firebase-admin'
 import config from '../../config'
 
+const configModule = config.modules.messages
+
 class Db {
   static init (collection, type = false) {
     try {
       let app = null
       const appName = 'pimex-messages'
 
-      const serviceAccount = require(`${config.keysFolder}/${config.db.keyFilename}`)
+      const serviceAccount = require(`${config.keysFolder}${configModule.db.keyFilename}`)
 
       const dbConfig = {
         credential: admin.credential.cert(serviceAccount),
@@ -16,13 +18,13 @@ class Db {
 
       if (!admin.apps.length) {
         admin.initializeApp(dbConfig)
+        admin.firestore().settings({timestampsInSnapshots: true})
       }
 
       try {
         app = admin.app(appName)
       } catch (e) {
         admin.initializeApp(dbConfig, appName)
-        admin.firestore().settings({timestampsInSnapshots: true})
       }
 
       app = admin.app(appName)
