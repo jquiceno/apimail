@@ -1,6 +1,6 @@
 {
   "name": "@pimex/messages",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "description": "Pimex messages service",
   "main": "./dist/index.js",
   "repository": {
