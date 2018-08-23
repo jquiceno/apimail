@@ -18,7 +18,6 @@ class Db {
 
       if (!admin.apps.length) {
         admin.initializeApp(dbConfig)
-        admin.firestore().settings({timestampsInSnapshots: true})
       }
 
       try {
@@ -36,6 +35,7 @@ class Db {
       }
 
       const db = app.firestore()
+      db.settings({timestampsInSnapshots: true})
 
       return db.collection(collection)
     } catch (e) {
