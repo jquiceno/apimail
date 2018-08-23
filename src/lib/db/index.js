@@ -30,7 +30,6 @@ class Db {
       app = admin.app(appName)
 
       if (type === 'fb') {
-
         const db = admin.database(app)
 
         return db.ref(`/${collection}`)

@@ -1,6 +1,7 @@
 import moment from 'moment'
 import Db from '../db'
-import config from '../../config'
+import Utils from '../utils'
+// import config from '../../config'
 
 const collection = 'templates'
 
@@ -53,7 +54,8 @@ class Template {
       content: true,
       type: true,
       format: true,
-      board: true
+      board: true,
+      title: true
     }
   }
 
@@ -78,13 +80,17 @@ class Template {
     }
   }
 
-  async get () {
+  async get (render = false) {
     try {
       const tempRef = await this.db.child(this.id).once('value')
       let template = tempRef.val()
 
       if (!template) {
         throw new Error('Template not found or invalid')
+      }
+
+      if (render) {
+        template.content = Utils.renderTemplate(template.content, render)
       }
 
       template.ID = this.id

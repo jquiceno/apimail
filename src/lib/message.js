@@ -2,6 +2,7 @@ import Mailgun from './mailgun.js'
 import Event from './event.js'
 import Db from './db'
 import config from '../config'
+import Template from './template'
 
 const collection = 'messages'
 
@@ -47,8 +48,8 @@ class Message {
     return Promise.resolve(message)
   }
 
-  static async send (data, domain = config.providers.mailgun.domain) {
-    if(!data) {
+  static async send (data, domain = config.modules.messages.providers.mailgun.domain) {
+    if (!data) {
       return Promise.reject({
         error: {
           message: 'Bad request, email data not found'
@@ -63,6 +64,18 @@ class Message {
     let message
 
     try {
+      if (data.template) {
+        const template = new Template(data.template.ID)
+        const renderVars = data.template.vars || null
+        let templateData = await template.get(renderVars)
+
+        if (templateData) {
+          data.html = templateData.content
+        }
+
+        delete data.template
+      }
+
       await ref.set({
         state: 'sending'
       })
@@ -113,7 +126,7 @@ class Message {
     const date = new Date(timestamp * 1000)
     let rMessage = null
 
-    if(data['In-Reply-To']) {
+    if (data['In-Reply-To']) {
       rMessage = await Message.getAllBy('service.id', data['In-Reply-To'].substr(0, data['In-Reply-To'].length - 1).substr(1))
       rMessage = rMessage[0].ID
     }

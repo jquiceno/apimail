@@ -2,9 +2,27 @@ import Event from '../lib/event'
 import Email from '../lib/email.js'
 import Message from '../lib/message.js'
 import Template from '../lib/template'
-import Utils from '../lib/utils'
+// import Utils from '../lib/utils'
 
 function routes (server) {
+  server.route({
+    method: 'GET',
+    path: '/templates/{id}/preview',
+    handler: async (req, h) => {
+      const templateId = req.params.id
+
+      try {
+        const template = new Template(templateId)
+        const templateData = await template.getData()
+
+        return h.response(templateData['stripped-html']).type('text/html; charset=utf-8').code(200)
+      } catch (e) {
+        console.log(e)
+        return h.response(e).code(e.status_code)
+      }
+    }
+  })
+
   server.route({
     method: 'PUT',
     path: '/templates/{id}',
@@ -43,11 +61,7 @@ function routes (server) {
 
       try {
         const template = new Template(templateId)
-        const templateData = await template.get()
-
-        if (body) {
-          templateData.content = Utils.renderTemplate(templateData.content, body)
-        }
+        const templateData = await template.get(body)
 
         res = {
           data: templateData,
@@ -66,7 +80,6 @@ function routes (server) {
     method: 'GET',
     path: '/templates',
     handler: async (req, h) => {
-      const templateId = req.params.id
       const params = req.query
       const boardId = parseInt(params.board) || null
 
@@ -167,7 +180,6 @@ function routes (server) {
     path: '/{id}/preview',
     handler: async (req, h) => {
       const messageId = req.params.id
-      let res
 
       try {
         const message = new Message(messageId)
