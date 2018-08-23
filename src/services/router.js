@@ -13,9 +13,11 @@ function routes (server) {
 
       try {
         const template = new Template(templateId)
-        const templateData = await template.getData()
+        const templateData = await template.get()
 
-        return h.response(templateData['stripped-html']).type('text/html; charset=utf-8').code(200)
+        console.log(templateData)
+
+        return h.response(templateData.content).type('text/html; charset=utf-8').code(200)
       } catch (e) {
         console.log(e)
         return h.response(e).code(e.status_code)

@@ -24,6 +24,7 @@ class Db {
         app = admin.app(appName)
       } catch (e) {
         admin.initializeApp(dbConfig, appName)
+        admin.app(appName).firestore().settings({timestampsInSnapshots: true})
       }
 
       app = admin.app(appName)
@@ -35,7 +36,6 @@ class Db {
       }
 
       const db = app.firestore()
-      db.settings({timestampsInSnapshots: true})
 
       return db.collection(collection)
     } catch (e) {
