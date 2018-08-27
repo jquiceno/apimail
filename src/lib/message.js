@@ -6,10 +6,11 @@ import Template from './template'
 
 const collection = 'messages'
 
+const db = Db.init(collection)
+
 class Message {
   constructor (id) {
     this.id = id
-    this.db = Db.init(collection)
   }
 
   async getEvents () {
@@ -20,9 +21,9 @@ class Message {
     } catch (e) {
       return Promise.reject({
         error: {
-          message: e.message,
+          message: e.message
         },
-        status_code: 404,
+        status_code: 404
       })
     }
   }
@@ -31,7 +32,7 @@ class Message {
     let message
 
     try {
-      const messageRef = this.db.doc(this.id)
+      const messageRef = db.doc(this.id)
       message = await messageRef.get()
       message = message.data()
       message.ID = messageRef.id
@@ -41,7 +42,7 @@ class Message {
           message: 'There was an error getting the required message',
           provider: e.message
         },
-        status_code: 404,
+        status_code: 404
       })
     }
 
@@ -58,7 +59,6 @@ class Message {
       })
     }
 
-    const db = Db.init(collection)
     const ref = await db.doc()
 
     let message
@@ -101,7 +101,6 @@ class Message {
   }
 
   static async getAllBy (by, value) {
-    const db = Db.init(collection)
     let messages = []
 
     try {
@@ -120,8 +119,7 @@ class Message {
   }
 
   static async add (data, service, id = null) {
-    const db = Db.init(collection)
-    const ref = id ? await db.doc(id) : await db.doc()
+    const ref = id ? db.doc(id) : db.doc()
     const timestamp = data.timestamp || Date.now() / 1000
     const date = new Date(timestamp * 1000)
     let rMessage = null
@@ -131,7 +129,7 @@ class Message {
       rMessage = rMessage[0].ID
     }
 
-    const message = await ref.set({
+    await ref.set({
       to: data.to || data['To'],
       from: data.from || data['From'],
       subject: data.subject || data['Subject'],
@@ -166,7 +164,7 @@ class Message {
     const event = new Event(eventId)
     const eventData = await event.getData()
 
-    if (eventData.message !== this.id ) {
+    if (eventData.message !== this.id) {
       return Promise.reject({
         error: {
           message: 'El evento no pertenece al mensaje'

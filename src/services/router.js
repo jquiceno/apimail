@@ -15,8 +15,6 @@ function routes (server) {
         const template = new Template(templateId)
         const templateData = await template.get()
 
-        console.log(templateData)
-
         return h.response(templateData.content).type('text/html; charset=utf-8').code(200)
       } catch (e) {
         console.log(e)
@@ -34,11 +32,8 @@ function routes (server) {
       let res
 
       try {
-        console.log(body)
         const template = new Template(templateId)
         const templateData = await template.update(body)
-
-        console.log(templateData)
 
         res = {
           data: templateData,
