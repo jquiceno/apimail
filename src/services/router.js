@@ -132,6 +132,19 @@ function routes (server) {
       let res
 
       try {
+        if (!body.board) {
+          let e = {
+            error: {
+              message: 'Board Id not found or invalid'
+            },
+            status_code: 403
+          }
+
+          throw e
+        }
+
+        body.board = parseInt(body.board)
+
         const template = await Template.add(body)
 
         res = {
