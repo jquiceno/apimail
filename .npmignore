@@ -1,0 +1,9 @@
+node_modules
+vendor
+*-ignore.*
+*-key.*
+public
+.log
+.pimexrc
+package-lock.json
+*lock.*

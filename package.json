@@ -17,7 +17,6 @@
     "init": "pm2 start ./dist/server.js",
     "start": "node ./dist/server.js",
     "build": "babel src --out-dir dist",
-    "postinstall": "npm run build",
     "watch": "babel src --out-dir dist --watch"
   },
   "ava": {
