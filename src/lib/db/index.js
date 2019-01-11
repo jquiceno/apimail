@@ -1,15 +1,18 @@
+'use strict'
+
 import admin from 'firebase-admin'
-import config from '../../config'
+import fs from 'fs'
+import Error from 'boom'
+import Config from 'getfig'
 
-const configModule = config.modules.messages
+const configModule = Config.get('modules.db')
 
-class Db {
-  static init (collection, type = false) {
+class Firebase {
+  constructor (serviceAccount) {
     try {
-      let app = null
-      const appName = 'pimex-messages'
+      this.app = null
 
-      const serviceAccount = require(`${config.keysFolder}${configModule.db.keyFilename}`)
+      const appName = `pimex-${serviceAccount.project_id}`
 
       const dbConfig = {
         credential: admin.credential.cert(serviceAccount),
@@ -21,28 +24,71 @@ class Db {
       }
 
       try {
-        app = admin.app(appName)
+        this.app = admin.app(appName)
       } catch (e) {
         admin.initializeApp(dbConfig, appName)
-        admin.app(appName).firestore().settings({timestampsInSnapshots: true})
+        admin.app(appName).firestore().settings({ timestampsInSnapshots: true })
       }
 
-      app = admin.app(appName)
+      this.app = admin.app(appName)
+    } catch (e) {
+      return new Error(e)
+    }
+  }
 
-      if (type === 'fb') {
-        const db = admin.database(app)
+  firestore (collection = false) {
+    try {
+      const db = this.app.firestore()
 
+      if (collection) {
+        return db.collection(collection)
+      }
+
+      return db
+    } catch (e) {
+      return new Error(e)
+    }
+  }
+
+  firebase (collection = false) {
+    try {
+      const db = admin.database(this.app)
+
+      if (collection) {
         return db.ref(`/${collection}`)
       }
 
-      const db = app.firestore()
-
-      return db.collection(collection)
+      return db
     } catch (e) {
-      console.error(e)
-      throw new Error('Hubo un error iniciando la base de datos')
+      return new Error(e)
+    }
+  }
+
+  static init (collection = false, params = false) {
+    try {
+      let keyPath = null
+
+      if (!params.keyPath) {
+        keyPath = `${Config.get('paths.keysFolder')}/${configModule.keyFilename}`
+      }
+
+      if (!keyPath || !fs.existsSync(keyPath)) {
+        throw new Error('Firebase key not found or invalid')
+      }
+
+      const serviceAccount = require(keyPath)
+
+      const db = new Firebase(serviceAccount)
+
+      if (params.type === 'firestore') {
+        return db.firestore(collection)
+      }
+
+      return db.firebase(collection)
+    } catch (e) {
+      return new Error(e)
     }
   }
 }
 
-module.exports = Db
+module.exports = Firebase
