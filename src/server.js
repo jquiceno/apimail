@@ -1,2 +1,2 @@
-import {server as Server} from './'
+import { server as Server } from './'
 Server.start()

@@ -5,5 +5,5 @@ import Email from './lib/email.js'
 module.exports = {
   email: Email,
   server: Server,
-  event : Event
+  event: Event
 }

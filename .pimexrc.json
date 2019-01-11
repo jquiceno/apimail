@@ -1,5 +1,9 @@
 {
   "modules": {
+    "db": {
+      "projectId": "",
+      "keyFilename": ""
+    },
     "messages": {
       "name": "messages",
       "db": {
@@ -14,5 +18,9 @@
       }
     }
   },
-  "keysFolder": "config"
+  "paths": {
+    "config": ".config",
+    "public": "public",
+    "keysFolder": ".config"
+  }
 }
