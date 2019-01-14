@@ -8,24 +8,25 @@ import Config from 'getfig'
 const mailgunConfig = Config.get('providers.mailgun')
 const domain = mailgunConfig.domain
 
-test.beforeEach('Send Message', async t => {
-  const data = {
+let messageId = null
+let data = null
+
+test.before('Send Message', async t => {
+  data = {
     from: `Excited User <${uuid.v4()}@${domain}>`,
     to: 'loncuster@gmail.com',
     subject: 'Hello Message by Pimail',
-    text: 'Testing some Mailgun awesomeness!',
-    'o:testmode': true
+    text: 'Testing some Mailgun awesomeness!'
   }
 
   const message = await Mailgun.send(data)
 
-  t.context.message = message.id
-  t.context.data = data
+  messageId = message.id
   t.deepEqual(typeof message.id, 'string')
 })
 
 test('Get events', async t => {
-  const id = t.context.message
+  const id = messageId
   const mailgun = new Mailgun(id)
 
   let events = await mailgun.events()
@@ -34,8 +35,7 @@ test('Get events', async t => {
 })
 
 test('Get message data', async t => {
-  const id = t.context.message
-  const data = t.context.data
+  const id = messageId
   const mailgun = new Mailgun(id)
 
   let messageData = await mailgun.info()
