@@ -16,6 +16,9 @@ const db = Db.init('trays', {
 
 class Tray {
   constructor (id) {
+    if (!id) {
+      throw Boom.badRequest('Tray id not found or invalid')
+    }
     this.id = id
     this.ref = db.doc(id)
   }
@@ -25,6 +28,11 @@ class Tray {
       const trayRef = this.ref
       let tray = await trayRef.get()
       tray = tray.data()
+
+      if (!tray) {
+        throw Boom.badRequest('Tray not found or invalid')
+      }
+
       tray.id = trayRef.id
       return Promise.resolve(tray)
     } catch (e) {
