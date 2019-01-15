@@ -21,6 +21,59 @@ class Message {
     this.ref = db.doc(id)
   }
 
+  async update (newData) {
+    try {
+      const messageRef = this.ref
+      await messageRef.update(newData)
+      const messageData = await this.get(this.id)
+
+      return Promise.resolve(messageData)
+    } catch (e) {
+      return Promise.reject(new Boom(e))
+    }
+  }
+
+  async asyncProvider () {
+    try {
+      let messageData = await this.get()
+      const mg = new Mailgun(messageData.provider.id)
+      const msgPvdEvents = await mg.events()
+
+      let correntState = messageData.state
+
+      if (msgPvdEvents.length > 0) {
+        let state = msgPvdEvents.filter(e => {
+          return e.event === 'delivered' || e.event === 'failed'
+        })
+
+        state = state[0].event
+
+        if (correntState !== state) {
+          const msgPvdInfo = await mg.info()
+
+          const newData = {
+            state,
+            sender: msgPvdInfo.sender,
+            recipients: msgPvdInfo.recipients,
+            attachments: msgPvdInfo.attachments,
+            html: msgPvdInfo['body-html'],
+            'content-type': msgPvdInfo['Content-Type'],
+            'body-plain': msgPvdInfo['body-plain'],
+            'body-html': msgPvdInfo['body-html']
+          }
+
+          await this.update(newData)
+        }
+      }
+
+      messageData = await this.get()
+
+      return Promise.resolve(messageData)
+    } catch (e) {
+      return Promise.reject(new Boom(e))
+    }
+  }
+
   static async getAll (params = {}) {
     try {
       let query = db
