@@ -5,8 +5,8 @@ import crypto from 'crypto'
 import Boom from 'boom'
 
 const provider = Config.get('providers.mailgun')
-
 const apiKey = provider.key
+const apiUrl = provider.api.url
 let domain = provider.domain
 
 class Mgun {
@@ -21,8 +21,7 @@ class Mgun {
 
       this.domain = domain
     } catch (e) {
-      console.log(e)
-      throw new Error('Hubo un error iniciando Mailgun')
+      throw new Boom('There was an error initiating Mailgun')
     }
   }
 
@@ -30,17 +29,20 @@ class Mgun {
     try {
       const filter = params.filter || {}
 
-      let events = await this.mailgun.get(`/${this.domain}/events`, {
-        'message-id': `<${this.id}>`
+      let events = await request({
+        method: 'GET',
+        url: `${apiUrl}/${this.domain}/events`,
+        qs: {
+          'message-id': `${this.id}`,
+          event: filter.event || null
+        },
+        headers: {
+          Authorization: Mgun.encodeApiKey(apiKey)
+        },
+        json: true
       })
 
       events = events.items
-
-      if (filter.event) {
-        events = events.filter(e => {
-          return e.event === filter.event
-        })
-      }
 
       return Promise.resolve(events)
     } catch (e) {
@@ -50,26 +52,28 @@ class Mgun {
 
   async info () {
     try {
+      let messaData = null
       const events = await this.events({
         filter: {
           event: 'accepted'
         }
       })
 
-      const url = events[0].storage.url
+      if (events.length >= 1) {
+        const url = events[0].storage.url
 
-      const messaData = request({
-        method: 'GET',
-        uri: url,
-        json: true,
-        headers: {
-          Authorization: Mgun.encodeApiKey(apiKey)
-        }
-      })
+        messaData = request({
+          method: 'GET',
+          uri: url,
+          json: true,
+          headers: {
+            Authorization: Mgun.encodeApiKey(apiKey)
+          }
+        })
+      }
 
       return Promise.resolve(messaData)
     } catch (e) {
-      console.log('Hubo un error en los eventos')
       return Promise.reject(new Boom(e))
     }
   }
@@ -87,7 +91,6 @@ class Mgun {
 
       return Promise.resolve(message)
     } catch (e) {
-      console.log(e)
       return Promise.reject(new Boom(e))
     }
   }
