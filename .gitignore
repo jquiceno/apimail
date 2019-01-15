@@ -5,7 +5,6 @@ vendor
 public
 .log
 .pimexrc
-package-lock.json
 dist
 *lock.*
 .config
