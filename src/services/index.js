@@ -22,15 +22,5 @@ module.exports = {
     console.log(`Email server start in port: ${port || server.info.port}`)
 
     return Promise.resolve(server.info)
-
-    // return new Promise((resolve, reject) => {
-    //   server.start(err => {
-    //     if (err) {
-    //       reject(err)
-    //     }
-    //     console.log(`Email server start in port: ${port || server.info.port}`)
-    //     resolve(server.info)
-    //   })
-    // })
   }
 }
