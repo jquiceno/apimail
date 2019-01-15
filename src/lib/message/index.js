@@ -21,6 +21,28 @@ class Message {
     this.ref = db.doc(id)
   }
 
+  static async getAll (params = {}) {
+    try {
+      let query = db
+      let messages = []
+      if (params.tray) {
+        query = query.where('tray', '==', params.tray)
+      }
+
+      query = await query.get()
+
+      query.forEach(msgRef => {
+        const msgData = msgRef.data()
+        msgData.id = msgRef.id
+        messages.push(msgData)
+      })
+
+      return Promise.resolve(messages)
+    } catch (e) {
+      return Promise.reject(new Boom(e))
+    }
+  }
+
   async remove () {
     try {
       const messaData = await this.get()
