@@ -41,8 +41,10 @@ test('Send new Message', async t => {
   const m = new Message(message.id)
   const messageData = await m.get()
 
+  const rm = await m.remove()
+
+  t.deepEqual(rm.id, message.id)
   t.deepEqual(messageData.subject, data.subject)
   t.deepEqual(messageData.tray, data.tray)
   t.deepEqual(messageData.to, data.to)
-  t.is(true, true)
 })

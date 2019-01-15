@@ -21,6 +21,18 @@ class Message {
     this.ref = db.doc(id)
   }
 
+  async remove () {
+    try {
+      const messaData = await this.get()
+      const messageRef = db.doc(messaData.id)
+      await messageRef.delete()
+
+      return Promise.resolve(messaData)
+    } catch (e) {
+      return Promise.reject(new Boom(e))
+    }
+  }
+
   async get () {
     try {
       const messageRef = this.ref
@@ -35,7 +47,6 @@ class Message {
 
       return Promise.resolve(message)
     } catch (e) {
-      console.log(e)
       return Promise.reject(new Boom(e))
     }
   }
