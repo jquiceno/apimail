@@ -29,13 +29,18 @@ class Mgun {
     try {
       const filter = params.filter || {}
 
+      const qs = {}
+
+      if (filter.event) {
+        qs.event = filter.event
+      }
+
+      qs['message-id'] = `${this.id}`
+
       let events = await request({
         method: 'GET',
         url: `${apiUrl}/${this.domain}/events`,
-        qs: {
-          'message-id': `${this.id}`,
-          event: filter.event || null
-        },
+        qs,
         headers: {
           Authorization: Mgun.encodeApiKey(apiKey)
         },

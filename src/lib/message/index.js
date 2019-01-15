@@ -86,8 +86,9 @@ class Message {
   static async add (data) {
     try {
       const ref = db.doc()
-      const date = moment().unix()
       let message = {}
+
+      data._created = moment().unix()
 
       // if (data['In-Reply-To']) {
       //   message = await Message.getAllBy('service.id', data['In-Reply-To'].substr(0, data['In-Reply-To'].length - 1).substr(1))
