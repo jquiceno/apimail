@@ -1,14 +1,14 @@
 import moment from 'moment'
 import Db from '../db'
 import Utils from '../utils'
-// import config from '../../config'
+import Boom from 'boom'
 
 const collection = 'templates'
+const db = Db.init(collection, 'fb')
 
 class Template {
   constructor (id) {
     this.id = id
-    this.db = Db.init(collection, 'fb')
   }
 
   async update (data) {
@@ -16,7 +16,7 @@ class Template {
       const date = moment()
       let newData = Template.validFormat(data)
 
-      const tempRef = this.db.child(this.id)
+      const tempRef = db.child(this.id)
 
       newData._updated = date.unix()
 
@@ -55,7 +55,10 @@ class Template {
       type: true,
       format: true,
       board: true,
-      title: true
+      title: true,
+      tray: true,
+      vars: true,
+      subject: true
     }
   }
 
@@ -66,7 +69,7 @@ class Template {
 
       const db = Db.init(collection, 'fb')
 
-      if (params.board) {
+      if (params.tray) {
         templatesRef = await db.orderByChild('board').equalTo(params.board).once('value')
       } else {
         templatesRef = await db.once('value')
@@ -82,7 +85,7 @@ class Template {
 
   async get (render = false) {
     try {
-      const tempRef = await this.db.child(this.id).once('value')
+      const tempRef = await db.child(this.id).once('value')
       let template = tempRef.val()
 
       if (!template) {
@@ -109,8 +112,6 @@ class Template {
   static async add (data) {
     try {
       const date = moment()
-      const db = Db.init(collection, 'fb')
-
       const templateData = Template.validFormat(data)
 
       templateData._created = date.unix()
@@ -118,24 +119,18 @@ class Template {
 
       const newTemplate = await db.push(templateData)
 
-      data.ID = newTemplate.key
+      data.id = newTemplate.key
 
       return Promise.resolve(data)
     } catch (e) {
-      return Promise.reject({
-        error: {
-          message: 'hubo un error almacenando la nota',
-          provider: e.message
-        },
-        status_code: 500
-      })
+      return Promise.reject(new Boom(e))
     }
   }
 
   async remove () {
     try {
       const templateData = await this.get()
-      await this.db.child(this.id).remove()
+      await db.child(this.id).remove()
       return Promise.resolve(templateData)
     } catch (e) {
       return Promise.reject(e)
