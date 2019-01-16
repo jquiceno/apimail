@@ -29,12 +29,7 @@ class Template {
 
       return Promise.resolve(newData)
     } catch (e) {
-      return Promise.reject({
-        error: {
-          message: e.message,
-        },
-        status_code: 404,
-      })
+      return Promise.reject(new Boom(e))
     }
   }
 
