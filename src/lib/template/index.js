@@ -8,6 +8,9 @@ const db = Db.init(collection, 'fb')
 
 class Template {
   constructor (id) {
+    if (!id) {
+      throw Boom.badRequest('Template id not found or invalid')
+    }
     this.id = id
   }
 
@@ -83,29 +86,29 @@ class Template {
     }
   }
 
-  async get (render = false) {
+  async get (options = {}) {
     try {
       const tempRef = await db.child(this.id).once('value')
       let template = tempRef.val()
 
       if (!template) {
-        throw new Error('Template not found or invalid')
+        throw Boom.badRequest('Template not found or invalid')
       }
 
-      if (render) {
-        template.content = Utils.renderTemplate(template.content, render)
+      if (options.render) {
+        let vars = template.vars || null
+        vars = (typeof options.render === 'object') ? Object.assign(vars, options.render) : vars
+
+        if (vars) {
+          template.content = Utils.renderTemplate(template.content, vars)
+        }
       }
 
-      template.ID = this.id
+      template.id = this.id
 
       return Promise.resolve(template)
     } catch (e) {
-      return Promise.reject({
-        error: {
-          message: e.message,
-        },
-        status_code: 404,
-      })
+      return Promise.reject(new Boom(e))
     }
   }
 
