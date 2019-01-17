@@ -28,6 +28,7 @@
   "license": "ISC",
   "dependencies": {
     "boom": "^7.3.0",
+    "defaults": "^1.0.3",
     "firebase-admin": "^6.5.0",
     "getfig": "0.0.3",
     "hapi": "^17.8.1",
