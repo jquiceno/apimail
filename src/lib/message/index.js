@@ -4,10 +4,12 @@ import Mailgun from '../mailgun'
 // import Event from './event.js'
 import Db from '../db'
 // import config from 'getfig'
-// import Template from './template'
+import Template from '../template'
 import Boom from 'boom'
 import Tray from '../tray'
 import moment from 'moment'
+import defaults from 'defaults'
+import Utils from '../utils'
 
 const collection = 'messages'
 
@@ -128,11 +130,13 @@ class Message {
 
   static async send (data) {
     try {
-      let message
+      data = defaults(data, {
+        template: null,
+        subject: null,
+        vars: null
+      })
 
-      if (!data) {
-        throw Boom.badRequest('Bad request, message data not found')
-      }
+      let message
 
       const tray = new Tray(data.tray)
       const trayData = await tray.get()
@@ -140,17 +144,35 @@ class Message {
       data.from = `${data.from} <${trayData.email}>`
       data.state = 'sending'
 
-      // if (data.template) {
-      //   const template = new Template(data.template.ID)
-      //   const renderVars = data.template.vars || null
-      //   let templateData = await template.get(renderVars)
-      //
-      //   if (templateData) {
-      //     data.html = templateData.content
-      //   }
-      //
-      //   delete data.template
-      // }
+      if (data.template) {
+        const template = new Template(data.template.id)
+        const renderVars = data.template.vars || data.vars || null
+        let templateData = await template.get(renderVars)
+
+        if (templateData) {
+          if (templateData.format === 'html') {
+            data.html = templateData.content
+          } else {
+            data.text = templateData.content
+          }
+        }
+
+        if (templateData.subject) {
+          data.subject = templateData.subject
+        }
+      } else {
+        if (data.vars) {
+          if (data.html) {
+            data.html = Utils.renderTemplate(data.html, data.vars)
+          }
+
+          if (data.text) {
+            data.text = Utils.renderTemplate(data.text, data.vars)
+          }
+        }
+      }
+
+      delete data.template
 
       const send = await Mailgun.send(data, {
         domain: trayData.domain

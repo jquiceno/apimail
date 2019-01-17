@@ -2,6 +2,7 @@ import moment from 'moment'
 import Db from '../db'
 import Utils from '../utils'
 import Boom from 'boom'
+import defaults from 'defaults'
 
 const collection = 'templates'
 const db = Db.init(collection, 'fb')
@@ -83,6 +84,9 @@ class Template {
 
   async get (options = {}) {
     try {
+      options = defaults(options, {
+        render: {}
+      })
       const tempRef = await db.child(this.id).once('value')
       let template = tempRef.val()
 

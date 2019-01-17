@@ -1,5 +1,8 @@
 const Utils = {
-  renderTemplate (template, params) {
+  renderTemplate (template = null, params = null) {
+    if (!template || !params) {
+      return null
+    }
     // const rgx = new RegExp(`{${e}}`, 'g')
     Object.keys(params).map((e, i) => {
       const reg = `{{${e.toLowerCase()}}}`
