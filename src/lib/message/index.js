@@ -10,6 +10,7 @@ import Tray from '../tray'
 import moment from 'moment'
 import defaults from 'defaults'
 import Utils from '../utils'
+import Ext from './lib'
 
 const collection = 'messages'
 
@@ -21,6 +22,7 @@ class Message {
   constructor (id) {
     this.id = id
     this.ref = db.doc(id)
+    this.event = Ext.event(this)
   }
 
   async update (newData) {
