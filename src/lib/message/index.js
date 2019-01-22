@@ -11,6 +11,7 @@ import moment from 'moment'
 import defaults from 'defaults'
 import Utils from '../utils'
 import Ext from './lib'
+import { Emitter } from '../event'
 
 const collection = 'messages'
 
@@ -185,6 +186,8 @@ class Message {
         id: send.id
       }
 
+      Emitter.emit('message.send', data)
+
       message = await Message.add(data)
 
       return Promise.resolve(message)
@@ -229,6 +232,8 @@ class Message {
       // })
 
       data.id = ref.id
+
+      Emitter.emit('message.created', data)
 
       return Promise.resolve(data)
     } catch (e) {
