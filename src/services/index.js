@@ -1,7 +1,7 @@
 'use strict'
 
 import Hapi from 'hapi'
-import router from './router'
+import routes from './routes'
 
 const portDefault = process.env.PORT || 4008
 
@@ -16,7 +16,8 @@ module.exports = {
         stripTrailingSlash: true
       }
     })
-    server = router(server)
+
+    server.route(routes)
 
     await server.start()
     console.log(`Email server start in port: ${port || server.info.port}`)
