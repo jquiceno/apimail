@@ -1,14 +1,14 @@
 {
-  "name": "@pimex/messages",
-  "version": "0.0.23",
-  "description": "Pimex messages service",
+  "name": "apimail",
+  "version": "0.0.1",
+  "description": "Small project to manage email messages and their events, initially based on mailgun",
   "main": "./dist/index.js",
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@gitlab.com/pimex/core-email.git"
+    "url": "https://github.com/jquiceno/apimail.git"
   },
   "bugs": {
-    "url": "https://gitlab.com/pimex/core-email/issues"
+    "url": "https://github.com/jquiceno/apimail.git/issues"
   },
   "homepage": "https://pimex.co/",
   "scripts": {
