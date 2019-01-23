@@ -15,15 +15,24 @@ class Event {
     this.id = eventId
   }
 
-  static async getAllBy (key, value) {
+  static async getAllBy (key, value, q = false) {
     try {
       let events = []
 
       const query = await db.orderByChild(key).equalTo(value).once('value')
 
       events = query.val()
+      events = Event.normalize(events)
 
-      return Promise.resolve(Event.normalize(events))
+      if (q) {
+        if (q.provider.id) {
+          events = events.filter(e => {
+            return e.provider.id === q.provider.id
+          })
+        }
+      }
+
+      return Promise.resolve(events)
     } catch (e) {
       return Promise.reject(new Boom(e))
     }
@@ -44,8 +53,17 @@ class Event {
   static async add (data) {
     try {
       const timestamp = moment().unix()
+      let q = []
 
       data = defaults(data, {
+        recipient: defaults(data.device, {
+          domain: null,
+          value: null
+        }),
+        provider: defaults(data.device, {
+          id: null,
+          name: null
+        }),
         device: defaults(data.device, {
           type: null
         }),
@@ -60,9 +78,20 @@ class Event {
 
       data = Schema.validate(data, schemaTemplate)
 
-      const newEvent = await db.push(data)
+      if (data.provider.id) {
+        q = await Event.getAllBy('message', data.message, {
+          provider: {
+            id: data.provider.id
+          }
+        })
+      }
 
-      data.id = newEvent.key
+      if (q.length < 1) {
+        const newEvent = await db.push(data)
+        data.id = newEvent.key
+      } else {
+        data = q[0]
+      }
 
       return Promise.resolve(data)
     } catch (e) {
@@ -91,6 +120,34 @@ class Event {
     }
 
     return normData.reverse()
+  }
+
+  static format (provider, data) {
+    try {
+      let newData = {}
+      if (!provider) {
+        throw Boom.badRequest('Provider name es required')
+      }
+
+      if (provider === 'mailgun') {
+        newData = {
+          message: data.message,
+          provider: {
+            id: data.id || null,
+            name: provider
+          },
+          recipient: {
+            domain: data['recipient-domain'] || null,
+            value: data.recipient || null
+          },
+          event: data.event
+        }
+      }
+
+      return newData
+    } catch (e) {
+      return new Boom(e)
+    }
   }
 }
 
