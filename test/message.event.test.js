@@ -5,6 +5,7 @@ import Message from '../src/lib/message'
 import Tray from '../src/lib/tray'
 import uuid from 'uuid-base62'
 import Config from 'getfig'
+import delay from 'delay'
 
 const mailgunConfig = Config.get('providers.mailgun')
 const domain = mailgunConfig.domain
@@ -45,6 +46,22 @@ test.afterEach(async t => {
     const tray = new Tray(t.context.tray.id)
     await tray.remove()
   }
+})
+
+test('Async events provider', async t => {
+  const message = t.context.message
+
+  const m = new Message(message.id)
+  await delay(10000)
+  const events = await m.event.asyncProvider()
+  const events2 = await m.event.getAll()
+
+  for (let i in events) {
+    const e = events[i]
+    await m.event.remove(e.id)
+  }
+
+  t.deepEqual(events.filter(e => e.provider.id === events2[0].provider.id).length, 1)
 })
 
 test('Add new message event', async t => {

@@ -13,7 +13,7 @@ module.exports = {
     type: 'string'
   },
   recipient: {
-    type: 'string'
+    type: 'object'
   },
   region: {
     type: 'string'
@@ -37,6 +37,9 @@ module.exports = {
     type: 'object'
   },
   client: {
+    type: 'object'
+  },
+  provider: {
     type: 'object'
   }
 }
