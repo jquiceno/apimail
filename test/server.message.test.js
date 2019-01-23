@@ -8,6 +8,7 @@ import Config from 'getfig'
 import Template from '../src/lib/template'
 import Server from '../src/services'
 import request from 'request-promise'
+import delay from 'delay'
 
 const mailgunConfig = Config.get('providers.mailgun')
 const domain = mailgunConfig.domain
@@ -64,7 +65,7 @@ test('Send new message', async t => {
   const server = t.context.server
 
   const res = await request({
-    uri: server.uri,
+    uri: `${server.uri}/messages`,
     method: 'POST',
     body: data,
     json: true
@@ -86,7 +87,7 @@ test('Error: tray not found', async t => {
 
   const err = await t.throwsAsync(async () => {
     const res = await request({
-      uri: server.uri,
+      uri: `${server.uri}/messages`,
       method: 'POST',
       body: data,
       json: true
@@ -105,7 +106,7 @@ test('Get message by id', async t => {
   const message = await Message.send(data)
 
   const res = await request({
-    uri: `${server.uri}/${message.id}`,
+    uri: `${server.uri}/messages/${message.id}`,
     method: 'GET',
     json: true
   })
@@ -122,7 +123,7 @@ test('Error: message not found', async t => {
 
   const err = await t.throwsAsync(async () => {
     const res = await request({
-      uri: `${server.uri}/${uuid.v4()}`,
+      uri: `${server.uri}/messages/${uuid.v4()}`,
       method: 'GET',
       json: true
     })
@@ -137,19 +138,26 @@ test('Error: message not found', async t => {
 test('Get all message events', async t => {
   const data = t.context.messageData
   const server = t.context.server
-  const message = await Message.send(data)
+  let message = await Message.send(data)
+
+  await delay(10000)
 
   const res = await request({
-    uri: `${server.uri}/${message.id}/events`,
+    uri: `${server.uri}/messages/${message.id}/events`,
     method: 'GET',
     json: true
   })
 
-  console.log(res)
+  message = new Message(message.id)
+  const events = await message.event.getAll()
+
+  for (let i in events) {
+    await message.event.remove(events[i].id)
+  }
 
   t.context.message = message
 
-  // t.deepEqual(message.to, res.data.to)
-  // t.is(message.id, res.data.id)
+  t.deepEqual(res.data.length, events.length)
+  t.deepEqual(res.data.filter(e => e.provider.id === events[0].provider.id).length, 1)
   t.is(res.statusCode, 200)
 })
