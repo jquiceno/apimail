@@ -1,23 +1,24 @@
 {
-  "name": "apimail",
-  "version": "0.0.1",
+  "name": "devmail",
+  "version": "0.1.0",
   "description": "Small project to manage email messages and their events, initially based on mailgun",
   "main": "./dist/index.js",
+
   "repository": {
     "type": "git",
-    "url": "https://github.com/jquiceno/apimail.git"
+    "url": "https://github.com/jquiceno/devmail.git"
   },
   "bugs": {
-    "url": "https://github.com/jquiceno/apimail.git/issues"
+    "url": "https://github.com/jquiceno/devmail.git/issues"
   },
   "homepage": "https://pimex.co/",
   "scripts": {
-    "dev": "NODE_ENV=test ava -v -s -- -w",
+    "dev-test": "NODE_ENV=test ava -v -s -- -w",
     "test": "NODE_ENV=test ava -v -s ./test/**.js",
-    "init": "pm2 start ./dist/server.js",
-    "start": "node ./dist/server.js",
+    "init": "npm run build && pm2 start ./dist/server.js",
+    "start": "npm run build && node ./dist/server.js",
     "build": "babel src --out-dir dist",
-    "watch": "babel src --out-dir dist --watch"
+    "dev": "pm2 start ./dist/server.js --watch && babel src --out-dir dist --watch"
   },
   "ava": {
     "require": [
