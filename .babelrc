@@ -1,9 +1,7 @@
 {
   "presets": [
-    "@babel/preset-env"
-  ],
-  "plugins": [
-    "@babel/plugin-transform-runtime",
-    "@babel/plugin-transform-async-to-generator"
+    ["@babel/preset-env", {
+      "exclude": ["transform-regenerator", "transform-async-to-generator", "transform-arrow-functions"]
+    }]
   ]
 }

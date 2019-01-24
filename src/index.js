@@ -1,9 +1,11 @@
+'use strict'
+
 import Event from './lib/event'
 import Server from './services/'
-import Email from './lib/email.js'
+import Message from './lib/message'
 
 module.exports = {
-  email: Email,
+  Message,
   server: Server,
   event: Event
 }
