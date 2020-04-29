@@ -1,11 +1,9 @@
 'use strict'
 
-import Event from './lib/event'
-import Server from './services/'
-import Message from './lib/message'
+const Event = require('./lib/event')
+const Message = require('./lib/message')
 
 module.exports = {
   Message,
-  server: Server,
-  event: Event
+  Event
 }

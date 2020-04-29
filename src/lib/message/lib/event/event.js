@@ -1,11 +1,11 @@
 'use strict'
 
-import Db from '../../../db'
-import Boom from 'boom'
-import moment from 'moment'
-import defaults from 'defaults'
-import { Schema } from 'schemio'
-import schemaTemplate from './schema'
+const Db = require('../../../db')
+const Boom = require('boom')
+const moment = require('moment')
+const defaults = require('defaults')
+const { Schema } = require('schemio')
+const schemaTemplate = require('./schema')
 
 const collection = 'events'
 const db = Db.init(collection)

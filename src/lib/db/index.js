@@ -1,9 +1,9 @@
 'use strict'
 
-import admin from 'firebase-admin'
-import fs from 'fs'
-import Error from 'boom'
-import Config from 'getfig'
+const admin = require('firebase-admin')
+const fs = require('fs')
+const Error = require('boom')
+const Config = require('getfig')
 
 const configModule = Config.get('modules.db')
 

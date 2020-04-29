@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "description": "Small project to manage email messages and their events, initially based on mailgun",
   "main": "./dist/index.js",
-
   "repository": {
     "type": "git",
     "url": "https://github.com/jquiceno/devmail.git"
@@ -13,22 +12,16 @@
   },
   "homepage": "https://pimex.co/",
   "scripts": {
-    "dev-test": "NODE_ENV=test ava -v -s -- -w",
+    "dev:test": "NODE_ENV=test ava -v -s -- -w",
     "test": "NODE_ENV=test ava -v -s ./test/**.js",
-    "init": "npm run build && pm2 start ./dist/server.js",
-    "start": "npm run build && node ./dist/server.js",
-    "build": "babel src --out-dir dist",
-    "dev": "pm2 start ./dist/server.js --watch && babel src --out-dir dist --watch"
-  },
-  "ava": {
-    "require": [
-      "@babel/register"
-    ]
+    "start": "NODE_ENV=production pm2 start ./index.js",
+    "dev": "DEBUG=server:* NODE_ENV=dev nodemon ./app.js"
   },
   "author": "jquiceno",
   "license": "ISC",
   "dependencies": {
     "boom": "^7.3.0",
+    "debug": "^4.1.1",
     "defaults": "^1.0.3",
     "firebase-admin": "^6.5.0",
     "getfig": "0.0.3",
@@ -42,10 +35,9 @@
     "schemio": "^0.1.4"
   },
   "devDependencies": {
-    "@babel/core": "^7.2.2",
-    "@babel/preset-env": "^7.2.3",
     "ava": "^1.0.1",
     "delay": "^4.1.0",
+    "nodemon": "^2.0.3",
     "uuid-base62": "^0.1.0"
   }
 }

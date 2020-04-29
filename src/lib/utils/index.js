@@ -1,3 +1,5 @@
+'use stritc'
+
 const Utils = {
   renderTemplate (template = null, params = null) {
     if (!template || !params) {

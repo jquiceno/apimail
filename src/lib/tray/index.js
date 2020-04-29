@@ -1,10 +1,10 @@
 'use strict'
 
-import Db from '../db'
-import Config from 'getfig'
-import moment from 'moment'
-import Boom from 'boom'
-import Joi from 'joi'
+const Db = require('../db')
+const Config = require('getfig')
+const moment = require('moment')
+const Boom = require('boom')
+const Joi = require('joi')
 
 const configModule = Config.get('modules.tray')
 

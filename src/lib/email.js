@@ -1,8 +1,8 @@
 'use strict'
 
 // import * as firebase from 'firebase-admin'
-import Message from './message.js'
-import Event from './event.js'
+const Message = require('./message.js')
+const Event = require('./event.js')
 
 class Email extends Message {
   constructor (id) {

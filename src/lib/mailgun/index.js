@@ -1,8 +1,10 @@
-import Mailgun from 'mailgun-js'
-import request from 'request-promise'
-import Config from 'getfig'
-import crypto from 'crypto'
-import Boom from 'boom'
+'use strict'
+
+const Mailgun = require('mailgun-js')
+const request = require('request-promise')
+const Config = require('getfig')
+const crypto = require('crypto')
+const Boom = require('boom')
 
 const provider = Config.get('providers.mailgun')
 const apiKey = provider.key

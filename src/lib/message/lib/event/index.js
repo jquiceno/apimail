@@ -1,8 +1,8 @@
 'use strict'
 
-import Event from './event'
-import Boom from 'boom'
-import Mailgun from '../../../mailgun/'
+const Event = require('./event')
+const Boom = require('boom')
+const Mailgun = require('../../../mailgun/')
 
 module.exports = self => {
   return {

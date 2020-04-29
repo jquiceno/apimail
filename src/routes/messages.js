@@ -1,6 +1,6 @@
 'use strict'
 
-import Message from '../../lib/message'
+const Message = require('../lib/message')
 
 const routes = [
   {

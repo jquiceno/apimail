@@ -1,14 +1,14 @@
 'use strict'
 
 import Hapi from 'hapi'
-import routes from './routes'
+import router from './router'
 
-const portDefault = process.env.PORT || 3000
+const portDefault = process.env.PORT || 4008
 
 module.exports = {
   async start (portCustom, host) {
     const port = (portCustom === 'test') ? null : portCustom || portDefault
-    host = host || '0.0.0.0'
+    host = host || 'localhost'
     let server = new Hapi.Server({
       host,
       port,
@@ -16,11 +16,10 @@ module.exports = {
         stripTrailingSlash: true
       }
     })
-
-    server.route(routes)
+    server = router(server)
 
     await server.start()
-    server.log('info', `Email server start in port: ${port || server.info.port}`)
+    console.log(`Email server start in port: ${port || server.info.port}`)
 
     return Promise.resolve(server.info)
   }

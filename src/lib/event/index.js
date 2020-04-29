@@ -1,11 +1,9 @@
 'use strict'
 
-import Emitter from './lib/event'
-import Callback from './lib/callback'
-// import Socket from './lib/socket'
+const Emitter = require('./lib/event')
+const Callback = require('./lib/callback')
 
 module.exports = {
   Callback,
   Emitter
-  // Socket
 }

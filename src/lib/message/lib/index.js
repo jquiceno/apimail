@@ -1,6 +1,6 @@
 'use strict'
 
-import event from './event'
+const event = require('./event')
 
 module.exports = {
   event

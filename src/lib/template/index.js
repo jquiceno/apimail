@@ -1,8 +1,10 @@
-import moment from 'moment'
-import Db from '../db'
-import Utils from '../utils'
-import Boom from 'boom'
-import defaults from 'defaults'
+'use strict'
+
+const moment = require('moment')
+const Db = require('../db')
+const Utils = require('../utils')
+const Boom = require('boom')
+const defaults = require('defaults')
 
 const collection = 'templates'
 const db = Db.init(collection, 'fb')

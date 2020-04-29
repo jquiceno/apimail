@@ -1,17 +1,15 @@
 'use strict'
 
-import Mailgun from '../mailgun'
-// import Event from './event.js'
-import Db from '../db'
-// import config from 'getfig'
-import Template from '../template'
-import Boom from 'boom'
-import Tray from '../tray'
-import moment from 'moment'
-import defaults from 'defaults'
-import Utils from '../utils'
-import Ext from './lib'
-import { Emitter } from '../event'
+const Mailgun = require('../mailgun')
+const Db = require('../db')
+const Template = require('../template')
+const Boom = require('boom')
+const Tray = require('../tray')
+const moment = require('moment')
+const defaults = require('defaults')
+const Utils = require('../utils')
+const Ext = require('./lib')
+const { Emitter } = require('../event')
 
 const collection = 'messages'
 
