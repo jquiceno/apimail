@@ -12,7 +12,7 @@
   },
   "homepage": "https://pimex.co/",
   "scripts": {
-    "dev:test": "NODE_ENV=test ava -v -s -- -w",
+    "dev:test": "NODE_ENV=test ava -w",
     "test": "NODE_ENV=test ava -v -s ./test/**.js",
     "start": "NODE_ENV=production pm2 start ./index.js",
     "dev": "DEBUG=server:* NODE_ENV=dev nodemon ./app.js"
@@ -32,12 +32,12 @@
     "pm2": "^3.2.8",
     "request": "^2.88.0",
     "request-promise": "^4.2.2",
-    "schemio": "^0.1.4"
+    "schemio": "^0.1.4",
+    "uuid": "^7.0.3"
   },
   "devDependencies": {
-    "ava": "^1.0.1",
+    "ava": "^3.8.1",
     "delay": "^4.1.0",
-    "nodemon": "^2.0.3",
-    "uuid-base62": "^0.1.0"
+    "nodemon": "^2.0.3"
   }
 }

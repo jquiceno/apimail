@@ -1,26 +1,41 @@
 'use strict'
 
 const Db = require('../db')
-const Config = require('getfig')
 const moment = require('moment')
 const Boom = require('boom')
 const Joi = require('joi')
-
-const configModule = Config.get('modules.tray')
-
-// console.log(configModule)
+const debug = require('debug')('tray:class')
 
 const db = Db.init('trays', {
   type: 'firestore'
 })
 
 class Tray {
-  constructor (id) {
+  constructor (id = false) {
     if (!id) {
       throw Boom.badRequest('Tray id not found or invalid')
     }
     this.id = id
     this.ref = db.doc(id)
+  }
+
+  static async getAll () {
+    try {
+      const trays = []
+      const query = db
+
+      const traysRef = await query.get()
+
+      traysRef.forEach(trayRef => {
+        const trayData = trayRef.data()
+        trayData.id = trayRef.id
+        trays.push(trayData)
+      })
+
+      return trays
+    } catch (error) {
+      throw new Boom(error)
+    }
   }
 
   async get () {
@@ -34,63 +49,68 @@ class Tray {
       }
 
       tray.id = trayRef.id
-      return Promise.resolve(tray)
-    } catch (e) {
-      return Promise.reject(new Boom(e))
+      return tray
+    } catch (error) {
+      throw new Boom(error)
     }
   }
 
-  static async getBy (key, value) {
+  static async getAllBy (key, value) {
     try {
       const ref = db
-      let trays = []
-      // let response = []
-
-      let query = ref.where(key, '==', value)
+      const trays = []
+      const query = ref.where(key, '==', value)
 
       const traysRef = await query.get()
 
       traysRef.forEach(trayRef => {
-        let trayData = trayRef.data()
+        const trayData = trayRef.data()
         trayData.id = trayRef.id
         trays.push(trayData)
       })
 
-      return Promise.resolve(trays)
-    } catch (e) {
-      return Promise.reject(new Boom(e.message))
+      return trays
+    } catch (error) {
+      throw new Boom(error)
     }
   }
 
-  static async add (data) {
+  static async add (data = null) {
     try {
-      const validEmail = Joi.validate(data.email, Joi.string().email())
+      if (!data) throw Boom.badRequest('Tray data not fount or invalid')
 
-      if (validEmail.error) {
-        throw Boom.badRequest('Email not found or invalid')
-      }
+      const date = moment().unix()
 
-      const trays = await Tray.getBy('email', data.email)
+      const email = (typeof data === 'object') ? data.email : data
+      const { error } = Joi.validate(email, Joi.string().email())
 
-      if (trays.length > 0) {
-        throw Boom.conflict(`Tray with the email ${data.email} already exists`)
-      }
+      if (error) throw Boom.badRequest('Email not found or invalid')
 
-      data._created = moment().unix()
-      data._updated = moment().unix()
+      const trays = await Tray.getAllBy('email', email)
 
-      const email = data.email.toLowerCase()
-
-      data.domain = email.split('@')[1]
-      data.name = email.split('@')[0]
-      data.email = email
+      if (trays.length) throw Boom.conflict(`Tray with the email ${data.email} already exists`)
 
       const ref = db.doc()
+
+      data = {
+        domain: email.split('@')[1],
+        name: email.split('@')[0],
+        email: email.toLowerCase(),
+        _created: date,
+        _updated: date,
+        status: 'active'
+      }
+
       await ref.set(data)
+
       data.id = ref.id
-      return Promise.resolve(data)
-    } catch (e) {
-      return Promise.reject(new Boom(e))
+
+      debug('Tray created')
+
+      return data
+    } catch (error) {
+      debug('Error creating tray', error)
+      throw new Boom(error)
     }
   }
 
@@ -100,9 +120,9 @@ class Tray {
       const trayRef = db.doc(trayData.id)
       await trayRef.delete()
 
-      return Promise.resolve(trayData)
-    } catch (e) {
-      return Promise.reject(new Boom(e))
+      return trayData.id
+    } catch (error) {
+      throw new Boom(error)
     }
   }
 }
