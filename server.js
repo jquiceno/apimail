@@ -1,6 +1,6 @@
 'use strict'
 
-const Hapi = require('hapi')
+const Hapi = require('@hapi/hapi')
 const routes = require('./src/routes')
 const debug = require('debug')('server:info')
 

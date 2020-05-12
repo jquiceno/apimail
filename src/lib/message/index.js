@@ -1,86 +1,37 @@
 'use strict'
 
-const Mailgun = require('../mailgun')
 const Db = require('../db')
-const Template = require('../template')
-const Boom = require('boom')
+const Boom = require('@hapi/boom')
 const Tray = require('../tray')
 const moment = require('moment')
 const defaults = require('defaults')
-const Utils = require('../utils')
-const Ext = require('./lib')
-const { Emitter } = require('../event')
 
-const collection = 'messages'
-
-const db = Db.init(collection, {
+const db = Db.init('messages', {
   type: 'firestore'
 })
 
 class Message {
-  constructor (id) {
+  constructor (id, clients = []) {
     this.id = id
     this.ref = db.doc(id)
-    this.event = Ext.event(this)
+    this.clients = clients
   }
 
   async update (newData) {
     try {
-      const messageRef = this.ref
-      await messageRef.update(newData)
-      const messageData = await this.get(this.id)
+      await this.ref.update(newData)
 
-      return Promise.resolve(messageData)
-    } catch (e) {
-      return Promise.reject(new Boom(e))
-    }
-  }
-
-  async asyncProvider () {
-    try {
-      let messageData = await this.get()
-      const mg = new Mailgun(messageData.provider.id)
-      const msgPvdEvents = await mg.events()
-
-      let correntState = messageData.state
-
-      if (msgPvdEvents.length > 0) {
-        let state = msgPvdEvents.filter(e => {
-          return e.event === 'delivered' || e.event === 'failed'
-        })
-
-        state = state[0].event
-
-        if (correntState !== state) {
-          const msgPvdInfo = await mg.info()
-
-          const newData = {
-            state,
-            sender: msgPvdInfo.sender,
-            recipients: msgPvdInfo.recipients,
-            attachments: msgPvdInfo.attachments,
-            html: msgPvdInfo['body-html'],
-            'content-type': msgPvdInfo['Content-Type'],
-            'body-plain': msgPvdInfo['body-plain'],
-            'body-html': msgPvdInfo['body-html']
-          }
-
-          await this.update(newData)
-        }
-      }
-
-      messageData = await this.get()
-
-      return Promise.resolve(messageData)
-    } catch (e) {
-      return Promise.reject(new Boom(e))
+      return this.get(this.id)
+    } catch (error) {
+      throw Boom.boomify(error)
     }
   }
 
   static async getAll (params = {}) {
     try {
       let query = db
-      let messages = []
+      const messages = []
+
       if (params.tray) {
         query = query.where('tray', '==', params.tray)
       }
@@ -93,9 +44,9 @@ class Message {
         messages.push(msgData)
       })
 
-      return Promise.resolve(messages)
-    } catch (e) {
-      return Promise.reject(new Boom(e))
+      return messages
+    } catch (error) {
+      throw Boom.boomify(error)
     }
   }
 
@@ -105,9 +56,9 @@ class Message {
       const messageRef = db.doc(messaData.id)
       await messageRef.delete()
 
-      return Promise.resolve(messaData)
-    } catch (e) {
-      return Promise.reject(new Boom(e))
+      return messaData
+    } catch (error) {
+      throw Boom.boomify(error)
     }
   }
 
@@ -124,8 +75,8 @@ class Message {
       message.id = messageRef.id
 
       return Promise.resolve(message)
-    } catch (e) {
-      return Promise.reject(new Boom(e))
+    } catch (error) {
+      throw Boom.boomify(error)
     }
   }
 
@@ -137,7 +88,7 @@ class Message {
         vars: null
       })
 
-      let message
+      let message = {}
 
       const tray = new Tray(data.tray)
       const trayData = await tray.get()
@@ -145,97 +96,42 @@ class Message {
       data.from = `${data.from} <${trayData.email}>`
       data.state = 'sending'
 
-      if (data.template) {
-        const template = new Template(data.template.id)
-        const renderVars = data.template.vars || data.vars || null
-        let templateData = await template.get(renderVars)
-
-        if (templateData) {
-          if (templateData.format === 'html') {
-            data.html = templateData.content
-          } else {
-            data.text = templateData.content
-          }
-        }
-
-        if (templateData.subject) {
-          data.subject = templateData.subject
-        }
-      } else {
-        if (data.vars) {
-          if (data.html) {
-            data.html = Utils.renderTemplate(data.html, data.vars)
-          }
-
-          if (data.text) {
-            data.text = Utils.renderTemplate(data.text, data.vars)
-          }
-        }
-      }
-
       delete data.template
-
-      const send = await Mailgun.send(data, {
-        domain: trayData.domain
-      })
-
-      data.provider = {
-        name: 'mailgun',
-        id: send.id
-      }
-
-      Emitter.emit('message.send', data)
 
       message = await Message.add(data)
 
-      return Promise.resolve(message)
-    } catch (e) {
-      return Promise.reject(new Boom(e))
+      return message
+    } catch (error) {
+      throw Boom.boomify(error)
     }
   }
 
   static async add (data) {
     try {
       const ref = db.doc()
-      let message = {}
+      const date = moment().unix()
 
-      data._created = moment().unix()
+      const _data = {
+        created: date,
+        contentType: data.contentType,
+        content: data.content,
+        to: data.to,
+        from: data.from,
+        subject: data.subject,
+        state: 'saved',
+        sender: data.sender,
+        replyTo: data.replyTo,
+        clients: false,
+        data: data.data
+      }
 
-      // if (data['In-Reply-To']) {
-      //   message = await Message.getAllBy('service.id', data['In-Reply-To'].substr(0, data['In-Reply-To'].length - 1).substr(1))
-      //   message = message[0].ID
-      // }
+      await ref.set(_data)
 
-      // const mg = new Mailgun(data.provider.id)
-      // const mData = await mg.info()
+      _data.id = ref.id
 
-      await ref.set(data)
-
-      // await ref.set({
-      //   to: data.to || data['To'],
-      //   from: data.from || data['From'],
-      //   subject: data.subject || data['Subject'],
-      //   state: data['X-Mailgun-Incoming'] ? 'received' : 'send',
-      //   recipient: data['recipient'] || null,
-      //   sender: data.sender || null,
-      //   'user-agent': data['user-agent'] || data['User-Agent'] || null,
-      //   'body-html': data['body-html'] || data.html || null,
-      //   'body-plain': data['body-plain'] || null,
-      //   'stripped-html': data['stripped-html'] || data.html || null,
-      //   'stripped-text': data['stripped-text'] || null,
-      //   'message-headers': data['message-headers'] || null,
-      //   provider: data.provider,
-      //   _created: date,
-      //   replyTo: null
-      // })
-
-      data.id = ref.id
-
-      Emitter.emit('message.created', data)
-
-      return Promise.resolve(data)
-    } catch (e) {
-      return Promise.reject(new Boom(e))
+      return _data
+    } catch (error) {
+      throw Boom.boomify(error)
     }
   }
 }

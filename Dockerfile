@@ -1,13 +1,11 @@
-FROM node:10
-
-COPY ["package.json", "/usr/src/"]
+FROM node:12
 
 WORKDIR /usr/src
 
-RUN npm install
+COPY . .
 
-COPY [".", "/usr/src"]
+RUN npm install
 
 EXPOSE 3000
 
-CMD ["node", "./server.js"]
+CMD ["npm", "start"]

@@ -4,8 +4,7 @@ vendor
 *-key.*
 public
 .log
-.pimexrc
 dist
-*lock.*
 .config
 uploads
+config.*
